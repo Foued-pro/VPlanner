@@ -20,7 +20,6 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-const axios = require('axios');
 
 app.post('/chat', async (req, res) => {
   console.log("Requete reçue", req.body);
