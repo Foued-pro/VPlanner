@@ -1,176 +1,97 @@
 version: "3.1"
 
 nlu:
-- intent: plan_trip
+- intent: planVoyage
   examples: |
-    - je veux visiter [Tokyo](location) et [Okinawa](location)
-    - je reste [10 jours](duration)
-    - j'aimerais faire de la [plage](activity) et des [temples](activity)
-    - je veux planifier un voyage
-    - je cherche des informations sur les [vols](transport)
-    - je veux trouver un [hôtel](accommodation)
-    - je cherche des informations sur les [transports](transport)
-    - je veux trouver des [activités](activity) à faire
-    - je cherche des informations sur les [restaurants](activity)
-    - je veux trouver des informations sur les [attractions](activity)
-    - je veux visiter [Kyoto](location) et [Nara](location)
-    - je pars [une semaine](duration) au [Japon](location)
-    - organise un voyage avec des [plages](activity) et des [temples](activity)
-    - je veux découvrir la [culture japonaise](interest)
-    - je reste [10 jours](duration), je veux faire des [musées](activity) et de la [randonnée](activity)
-    - je veux faire du [shopping](activity) à [Tokyo](location)
-    - je veux voir les [cerisiers en fleurs](event)
-    - je souhaite me détendre dans des [onsen](activity) traditionnels
-    - trouve-moi un itinéraire entre [Tokyo](location) et [Osaka](location)
-    - je veux éviter les [lieux trop touristiques](constraint)
-    - je veux trouver des [activités](activity) pour les [enfants](person)
-    - je cherche des [restaurants](activity) avec des [vues](view)
-    - je veux faire du [shopping](activity) à [Shibuya](location)
-    - je veux visiter des [lieux historiques](interest)
-    - je recherche un [ryokan](accommodation) traditionnel
-    - je veux voir le [mont Fuji](location)
-    - je voyage avec des [personnes âgées](person)
-    - je veux goûter la [cuisine locale](interest)
-    - je cherche des [vols pas chers](transport)
-    - je veux visiter [Hiroshima](location) et [Miyajima](location)
-    - je reste [15 jours](duration) en [juillet](month)
-    - je veux assister à un [festival local](event)
-    - je cherche un [hôtel proche du centre](accommodation)
-    - je veux faire une [croisière](activity) à [Osaka](location)
-    - je veux visiter des [jardins japonais](interest)
-    - je cherche des [activités nocturnes](activity) à [Kyoto](location)
-    - je veux éviter les [foules](constraint)
-    - je voyage en [famille](person)
-    - je veux voir des [châteaux japonais](interest)
-    - je cherche un [circuit organisé](transport)
-    - je veux essayer le [kendo](activity)
-    - je veux visiter [Sapporo](location) en [hiver](season)
-    - je cherche des [logements insolites](accommodation)
-    - je veux faire du [vélo](activity) à [Nara](location)
-    - je veux voir des [feux d'artifice](event)
-    - je cherche des [guides locaux](person)
-    - je veux visiter [Kanazawa](location) pour ses [musées](activity)
-    - je veux un voyage [écologique](constraint)
-    - je cherche des [spas](activity) de luxe
-    - je veux visiter [Nagoya](location) pour sa [cuisine](interest)
-    - je reste [3 semaines](duration) en [automne](season)
-    - je veux faire une [excursion](activity) au [mont Koya](location)
-    - je cherche des [billets de train](transport)
-    - je veux visiter des [villages traditionnels](interest)
-    - je veux éviter les [hôtels bruyants](constraint)
-    - je voyage entre [amis](person)
-    - je veux voir des [spectacles de geisha](event)
-    - je cherche des [locations de voiture](transport)
-    - je veux visiter [Fukuoka](location) pour ses [marchés](activity)
-    - je veux faire du [ski](activity) à [Hokkaido](location)
-    - je cherche un [hôtel avec piscine](accommodation)
-    - je veux visiter [Kamakura](location) pour ses [temples](activity)
-    - je veux assister à une [cérémonie du thé](activity)
-    - je cherche des [visites guidées](activity) en [français](language)
-    - je veux visiter [Yokohama](location) pour son [quartier chinois](interest)
-    - je veux faire du [kayak](activity) à [Okinawa](location)
-    - je cherche des [hôtels près des gares](accommodation)
-    - je veux voir des [spectacles de kabuki](event)
-    - je veux visiter [Takayama](location) pour son [festival](event)
-    - je cherche des [activités gratuites](activity)
-    - je veux éviter les [restaurants chers](constraint)
-    - je voyage en [couple](person)
-    - je veux visiter [Kobe](location) pour son [bœuf](interest)
-    - je cherche des [circuits gastronomiques](activity)
-    - je veux faire du [surf](activity) à [Shikoku](location)
-    - je veux visiter [Matsumoto](location) pour son [château](interest)
-    - je cherche des [hôtels avec vue sur la mer](accommodation)
-    - "[anglais](language) et [japonais](language)"
-    - "[décembre](month)"
-    - "[vue panoramique](view)"
+    - Je veux planifier un voyage
+    - Organise-moi un séjour au Japon
+    - Aide-moi à préparer mon itinéraire
 
-- intent: change_plan
-  examples: |
-    - Je veux modifier mon voyage
-    - Change mon itinéraire
-    - Je souhaite annuler mon plan
 
-- intent: budget_query
+- intent: budget
   examples: |
-    - Quel budget prévoir pour 10 jours ?
-    - C'est cher à Kyoto ?
+    - Quel budget prévoir pour [10 jours](periode) ?
+    - C'est cher à [Kyoto](lieu) ?
     - Quel est le budget ?
     - Combien ça coûte ?
     - Parle-moi du budget
     - Je veux un voyage pas cher
+    - Mon budget est de [1000](montant) euros
+    - J'ai un petit budget
+    - Je peux dépenser jusqu'à [2000](montant) €
+    - Mon budget est élevé
+    - J’ai [1500](montant) euros à dépenser
+    - Mon budget est de [300](montant)
+    - Je peux mettre [700](montant) euros
 
-- intent: affirm
+ 
+- intent: affirmation
   examples: |
     - oui
     - exactement
     - c'est ça
 
-- intent: greet
+- intent: salutation
   examples: |
-    - salut
-    - bonjour
-    - hello
-    - hey
-
-- intent: ask_onsen
-  examples: |
-    - Y a-t-il des onsen au Japon ?
-    - Je veux visiter un onsen
-    - Recommande-moi un onsen
-
-- intent: inform_budget
-  examples: |
-    - Mon budget est de 1000 euros
-    - J'ai un petit budget
-    - Je peux dépenser jusqu'à 2000€
+    - Salut
+    - Bonjour
+    - Hello
+    - Hey
 
 
-- intent: goodbye
-  examples: |
-    - Au revoir
-    - À bientôt
-    - Ciao
-    - À plus tard
-
-- intent: inform
-  examples: |
-    - Je vais à Tokyo
-    - Pour 2 semaines
-    - Mon budget est élevé
-    - Je veux visiter des temples
-
-- intent: request_recommendation
+  
+- intent: demande_recommandation
   examples: |
     - Peux-tu me recommander une région ?
     - Quelle ville devrais-je visiter ?
     - Des suggestions pour un voyage au Japon ?
 
-- intent: deny
+
+- intent: au_revoir
   examples: |
-    - Non merci
-    - Pas maintenant
-    - Je ne veux pas
+    - Au revoir
+    - À bientôt
+    - À plus tard
 
 
-- synonym: mont_fuji  # Pas d'espaces dans le nom
+- intent: localisation
   examples: |
-    - Fuji-san
-    - Mont Fujiyama
+    - Je veux visiter [Tokyo](lieu)
+    - Je pars pour [Kyoto](lieu)
+    - Je suis à [Osaka](lieu)
+    - Je veux visiter [Fukuoka](lieu)
+    - Je suis à [Sapporo](lieu)
+    - Je pars pour [Nagoya](lieu)
+    - Trouve-moi des lieux à [Osaka](lieu)
 
-- synonym: ryokan
+
+- intent: activite
   examples: |
-    - auberge japonaise
-    - hôtel traditionnel
+    - Je veux faire du [shopping](tache)
+    - Je veux visiter des [temples](tache)
+    - Je veux aller à la [plage](tache)
+    - Je veux faire du [kayak](tache)
+    - Je veux faire du [vélo](tache)
+    - Je veux faire du [ski](tache)
+    - Je veux faire du [surf](tache)
+    - je cherche des informations sur les [restaurants](tache)
+    - je veux trouver des informations sur les [attractions](tache)
+    - Je veux essayer le [kendo](tache)
 
-#Tu as bien couvert les principaux slots/intents que tu veux détecter pour un voyage :
-#location (Tokyo, Okinawa, Kyoto…)
-#duration (10 jours, une semaine…)
-#activity (plage, temples, shopping, onsen…)
-#transport (vols, transports)
-#accommodation (hôtel)
-#interest (culture japonaise)
-#event (cerisiers en fleurs)
-#constraint (éviter les lieux trop touristiques)
+- intent: hebergement 
+  examples: |
+    - Je cherche un [hôtel](hebergement) à [Shibuya](lieu)
+    - Recommande un [ryokan](hebergement) avec [onsen](tache)
+    
+
+- intent: duree
+  examples: |
+    - Je reste [10 jours](periode)
+    - Je pars [une semaine](periode)
+    - Je reste [3 semaines](periode)
+    - Combien de temps me conseilles-tu ?  
+
+
 
 
 

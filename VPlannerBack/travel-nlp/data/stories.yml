@@ -1,29 +1,73 @@
 version: "3.1"
 
 stories:
-- story: demander preference onsen
-  steps:
-    - intent: ask_onsen
-    - action: utter_ask_onsen_preference
+  - story: flux_principal_voyage
+    steps:
+      - intent: salutation  
+      - action: action_session_start
+      - action: utter_bienvenue
+      - action: utter_demande_lieu
+      - intent: localisation
+        entities:
+          - lieu
+      - slot_was_set:
+          - lieu
+      - action: utter_demande_duree
+      - intent: duree
+        entities:
+          - periode
+      - slot_was_set:
+          - periode
+      - action: utter_demande_budget
+      - intent: budget
+        entities:
+          - montant
+      - slot_was_set:
+          - montant    
+      - action: utter_demande_activite
+      - intent: activite
+        entities:
+          - tache
+      - slot_was_set:
+          - tache
+      - action: utter_demande_hebergement
+      - intent: hebergement    
+        entities:
+          - hebergement
+      - slot_was_set:
+          - hebergement
+      - action: action_recherche_itineraire
+      - action: utter_demande_confirmation
+      - intent: affirmation
+      - action: utter_au_revoir
+        
 
-- story: annulation voyage
-  steps:
-    - intent: plan_trip
-    - action: utter_ask_confirmation_cancellation
-    - intent: deny
-    - action: utter_goodbye
 
-- story: demande durée voyage
-  steps:
-    - intent: plan_trip
-    - action: utter_ask_duration
+  - story: Salutation
+    steps:
+      - action: action_session_start
+      - intent: salutation
+      - action: utter_salutation
+      - intent: au_revoir
+      - action: utter_au_revoir
 
-- story: changement destination
-  steps:
-    - intent: change_plan
-    - action: utter_confirm_plan
+  - story: Affirmation simple
+    steps:
+      - action: action_session_start
+      - intent: affirmation
+      - action: utter_default
 
-- story: budget voyage
-  steps:
-    - intent: inform_budget
-    - action: utter_offer_help
+  - story: Demande recommandation
+    steps:
+      - action: action_session_start
+      - intent: demande_recommandation
+      - action: utter_activite_recommandation
+      - action: utter_hebergement_recommandation
+
+
+  - story: Localisation demande
+    steps:
+      - action: action_session_start
+      - intent: localisation
+      - action: utter_demande_lieu 
+

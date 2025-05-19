@@ -4,8 +4,14 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Explore from './components/Explore';
+import DevPanel from './components/DevPanel';
 
 function App() {
+  const [logs, setLogs] = useState([]);
+
+  const addLog = (entry) => {
+    setLogs(prev => [...prev, entry]);
+  };
   useEffect(() => {
     fetch('http://localhost:3000/')
       .then(response => response.text())
@@ -34,6 +40,7 @@ function App() {
           }
         />
         <Route path="/explore" element={<Explore />} />
+        <Route path="/dev" element={<DevPanel logs={logs} />} />
       </Routes>
       <Footer />
     </BrowserRouter>

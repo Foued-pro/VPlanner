@@ -1,0 +1,12 @@
+{
+    "rewrites": [
+      {
+        "source": "/api/:path*",
+        "destination": "https://vplanner-backend.herokuapp.com/api/:path*"
+      },
+      {
+        "source": "/webhooks/rest/:path*",
+        "destination": "https://rasa-vplanner.onrender.com/webhooks/rest/:path*"
+      }
+    ]
+  }

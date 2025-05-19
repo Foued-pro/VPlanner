@@ -11,15 +11,18 @@ const Explore = () => {
 
     // Ajoute le message utilisateur
     setMessages(prev => [...prev, { from: 'user', text: inputText }]);
+    addLog({ type: 'user_message', content: inputText });
 
     try {
-      const response = await fetch('http://localhost:3000/chat', {
+      const response = await fetch('http://localhost:5005/webhooks/rest/webhook', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: inputText, senderId: 'user1' }) // adapte senderId si besoin
       });
 
       const data = await response.json();
+      addLog({ type: 'server_response', content: data });
+
 
       // data.replies est un tableau d’objets réponses, on ajoute toutes les réponses bot
       const botMessages = data.replies.map(reply => ({
@@ -30,7 +33,9 @@ const Explore = () => {
       setMessages(prev => [...prev, ...botMessages]);
 
     } catch (error) {
-      setMessages(prev => [...prev, { from: 'bot', text: "Erreur serveur, veuillez réessayer." }]);
+      const errorMsg = "Erreur serveur, veuillez réessayer.";
+      setMessages(prev => [...prev, { from: 'bot', text: errorMsg }]);
+      addLog({ type: 'error', content: error.message });
     }
 
     setInputText('');

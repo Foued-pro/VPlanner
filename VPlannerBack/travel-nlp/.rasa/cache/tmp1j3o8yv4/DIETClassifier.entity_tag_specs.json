@@ -1,0 +1,52 @@
+[
+  {
+    "tag_name": "entity",
+    "ids_to_tags": {
+      "1": "B-hebergement",
+      "2": "I-hebergement",
+      "3": "L-hebergement",
+      "4": "U-hebergement",
+      "5": "B-lieu",
+      "6": "I-lieu",
+      "7": "L-lieu",
+      "8": "U-lieu",
+      "9": "B-montant",
+      "10": "I-montant",
+      "11": "L-montant",
+      "12": "U-montant",
+      "13": "B-periode",
+      "14": "I-periode",
+      "15": "L-periode",
+      "16": "U-periode",
+      "17": "B-tache",
+      "18": "I-tache",
+      "19": "L-tache",
+      "20": "U-tache",
+      "0": "O"
+    },
+    "tags_to_ids": {
+      "B-hebergement": 1,
+      "I-hebergement": 2,
+      "L-hebergement": 3,
+      "U-hebergement": 4,
+      "B-lieu": 5,
+      "I-lieu": 6,
+      "L-lieu": 7,
+      "U-lieu": 8,
+      "B-montant": 9,
+      "I-montant": 10,
+      "L-montant": 11,
+      "U-montant": 12,
+      "B-periode": 13,
+      "I-periode": 14,
+      "L-periode": 15,
+      "U-periode": 16,
+      "B-tache": 17,
+      "I-tache": 18,
+      "L-tache": 19,
+      "U-tache": 20,
+      "O": 0
+    },
+    "num_tags": 21
+  }
+]

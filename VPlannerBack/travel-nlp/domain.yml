@@ -1,50 +1,110 @@
 version: "3.1"
 
 intents:
-  - ask_onsen
-  - inform_budget
-  - plan_trip
-  - inform
-  - deny
-  - affirm
-  - goodbye
-  - change_plan
-  - request_recommendation
-  - budget_query
-  - greet
+  - planVoyage
+  - budget
+  - affirmation
+  - salutation
+  - demande_recommandation
+  - au_revoir
+  - localisation
+  - activite
+  - hebergement
+  - duree
+
+entities:
+  - tache
+  - lieu
+  - hebergement
+  - montant
+  - periode
 
 slots:
-  wants_onsen:
-    type: bool
-    initial_value: false
-    mappings: []
+  lieu:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: lieu
 
+  tache:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: tache
+
+  hebergement:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: hebergement
+  montant:
+    type: float
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: montant
+  periode:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: periode
   change_destination:
     type: bool
     initial_value: false
     mappings: []
 
-
 responses:
-  utter_ask_onsen_preference:
-    - text: "Préférez-vous un séjour dans un onsen (source chaude) ?"
-  utter_ask_confirmation_cancellation:
-    - text: "Voulez-vous annuler votre voyage ?"
-  utter_ask_duration:
-    - text: "Combien de jours souhaitez-vous partir ?"
-  utter_confirm_plan:
-    - text: "Confirmez-vous ce changement de destination ?"
-  utter_offer_help:
-    - text: "Puis-je vous aider à ajuster votre budget ?"
-  utter_goodbye:
-    - text: "Merci, à bientôt !"
-  utter_ask_budget:
+  utter_default:
+    - text: "Je suis désolé, je n'ai pas compris. Pouvez-vous reformuler ?"
+  utter_salutation:
+    - text: "Bonjour ! Comment puis-je vous aider pour votre voyage ? 😊" 
+  utter_au_revoir:
+    - text: "Bon voyage ! N'hésitez pas à revenir si vous avez d'autres questions."
+  utter_demande_budget:
     - text: "Quel budget prévoyez-vous pour votre voyage ?"
+  utter_bienvenue:
+    - text: "Bonjour ! Comment puis-je vous aider pour votre voyage ? 😊"
+  utter_demande_lieu:
+    - text: "Dans quelle ville ou région souhaitez-vous aller ?"
+  utter_demande_duree:
+    - text: "Combien de jours souhaitez-vous partir ?"
+  utter_demande_activite:
+    - text: "Quelles activités souhaitez-vous faire ?"
+  utter_demande_hebergement:
+    - text: "Quel type d'hébergement souhaitez-vous ?"
+
+  utter_activite_recommandation:
+    - condition:
+        - type: slot
+          name: tache
+          value: shopping
+      text: "Voici une liste de lieux que je recommande pour faire du shopping à {lieu} :"
+
+    - condition:
+        - type: slot
+          name: tache
+          value: temple
+      text: "Voici une liste de lieux que je recommande pour visiter des temples à {lieu} :"
+
+    - text: "Voici une liste de lieux que je recommande à {lieu} :"
+
+  utter_hebergement_recommandation:
+    - condition:
+        - type: slot
+          name: hebergement
+          value: ryokan
+      text: "Voici une liste de ryokan que je recommande pour {lieu} :"
+      
+    - text: "Voici une liste d'hébergements que je recommande à {lieu} :"
 
 actions:
-  - utter_ask_onsen_preference
-  - utter_ask_confirmation_cancellation
-  - utter_ask_duration
-  - utter_confirm_plan
-  - utter_offer_help
-  - utter_goodbye
+  - action_recherche_lieu
+  - action_recherche_activite
+  - action_recherche_hebergement
+  - action_recherche_itineraire
+  - action_session_start
+  - action_default_fallback
+  

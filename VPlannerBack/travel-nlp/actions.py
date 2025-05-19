@@ -1,38 +1,32 @@
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
-from rasa_sdk.types import DomainDict
+from rasa_sdk.events import SessionStarted, ActionExecuted, EventType
+from rasa_sdk.types import DomainDict   
+from typing import List
 
 
-class ActionAskDuration(Action):
+class ActionSessionStart(Action):
     def name(self) -> str:
-        return "action_ask_duration"
+        return "action_session_start"
 
-    def run(self, dispatcher: CollectingDispatcher,
-            tracker: Tracker,
-            domain: DomainDict):
-        dispatcher.utter_message(text="Combien de jours comptes-tu rester ?")
-        return []
-
-class ActionAskLocation(Action):
+    async def run(self, dispatcher, tracker, domain):
+        events = [SessionStarted()]
+        events.append(ActionExecuted("action_listen"))
+        
+        dispatcher.utter_message(template="utter_bienvenue")
+        dispatcher.utter_message(template="utter_demande_lieu")
+        
+        return events
+        
+class ActionSubmitTripPlan(Action):
     def name(self) -> str:
-        return "action_ask_location"
+        return "action_submit_trip_plan"
 
-    def run(self, dispatcher: CollectingDispatcher,
-            tracker: Tracker,
-            domain: DomainDict):
-        dispatcher.utter_message(text="Quelle(s) ville(s) veux-tu visiter ?")
-        return []
-
-class ActionPlanTrip(Action):
-    def name(self) -> str:
-        return "action_plan_trip"
-
-    def run(self, dispatcher: CollectingDispatcher,
-            tracker: Tracker,
-            domain: DomainDict):
-        # Ici tu récupères les slots, tu fais ta logique de planification
-        location = tracker.get_slot("location")
-        duration = tracker.get_slot("duration")
-        # Juste un exemple de message
-        dispatcher.utter_message(text=f"Ok, je planifie un voyage à {location} pour {duration}.")
+    def run(self, dispatcher, tracker, domain):
+        lieu = tracker.get_slot("lieu")
+        duree = tracker.get_slot("duree")
+        
+        response = f"✅ Voyage planifié !\nDestination: {lieu}\nDurée: {duree}"
+        dispatcher.utter_message(text=response)
+        
         return []
