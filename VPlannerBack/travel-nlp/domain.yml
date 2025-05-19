@@ -1,0 +1,50 @@
+version: "3.1"
+
+intents:
+  - ask_onsen
+  - inform_budget
+  - plan_trip
+  - inform
+  - deny
+  - affirm
+  - goodbye
+  - change_plan
+  - request_recommendation
+  - budget_query
+  - greet
+
+slots:
+  wants_onsen:
+    type: bool
+    initial_value: false
+    mappings: []
+
+  change_destination:
+    type: bool
+    initial_value: false
+    mappings: []
+
+
+responses:
+  utter_ask_onsen_preference:
+    - text: "Préférez-vous un séjour dans un onsen (source chaude) ?"
+  utter_ask_confirmation_cancellation:
+    - text: "Voulez-vous annuler votre voyage ?"
+  utter_ask_duration:
+    - text: "Combien de jours souhaitez-vous partir ?"
+  utter_confirm_plan:
+    - text: "Confirmez-vous ce changement de destination ?"
+  utter_offer_help:
+    - text: "Puis-je vous aider à ajuster votre budget ?"
+  utter_goodbye:
+    - text: "Merci, à bientôt !"
+  utter_ask_budget:
+    - text: "Quel budget prévoyez-vous pour votre voyage ?"
+
+actions:
+  - utter_ask_onsen_preference
+  - utter_ask_confirmation_cancellation
+  - utter_ask_duration
+  - utter_confirm_plan
+  - utter_offer_help
+  - utter_goodbye

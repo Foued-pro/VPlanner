@@ -1,0 +1,24 @@
+version: "3.1"
+
+rules:
+- rule: demander durée si oubliée
+  condition:
+  - active_loop: null
+  steps:
+  - intent: inform
+  - action: utter_ask_duration
+
+- rule: demande budget après durée
+  steps:
+  - intent: inform
+  - action: utter_ask_budget
+
+- rule: réponse positive après confirmation plan
+  steps:
+  - intent: affirm
+  - action: utter_offer_help
+
+- rule: dire au revoir
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye

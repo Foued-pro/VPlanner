@@ -1,0 +1,29 @@
+version: "3.1"
+
+stories:
+- story: demander preference onsen
+  steps:
+    - intent: ask_onsen
+    - action: utter_ask_onsen_preference
+
+- story: annulation voyage
+  steps:
+    - intent: plan_trip
+    - action: utter_ask_confirmation_cancellation
+    - intent: deny
+    - action: utter_goodbye
+
+- story: demande durée voyage
+  steps:
+    - intent: plan_trip
+    - action: utter_ask_duration
+
+- story: changement destination
+  steps:
+    - intent: change_plan
+    - action: utter_confirm_plan
+
+- story: budget voyage
+  steps:
+    - intent: inform_budget
+    - action: utter_offer_help
