@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useState } from 'react';
 
 const Explore = () => {
   const [inputText, setInputText] = useState('');
