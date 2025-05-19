@@ -1,45 +1,49 @@
 import React, { useState } from 'react';
-import { useState } from 'react';
 
-const Explore = () => {
+const Explore = () => {   
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState([
     { from: 'bot', text: 'Bonjour ! Comment puis-je vous aider à planifier votre voyage ?' }
   ]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSend = async () => {
     if (!inputText.trim()) return;
 
-    // Ajoute le message utilisateur
+    // Ajout immédiat du message utilisateur
     setMessages(prev => [...prev, { from: 'user', text: inputText }]);
-    addLog({ type: 'user_message', content: inputText });
+    setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5005/webhooks/rest/webhook', {
+      const response = await fetch(process.env.REACT_APP_RASA_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: inputText, senderId: 'user1' }) // adapte senderId si besoin
+        body: JSON.stringify({ message: inputText, senderId: 'user1' })
       });
 
+      if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+
       const data = await response.json();
-      addLog({ type: 'server_response', content: data });
-
-
-      // data.replies est un tableau d’objets réponses, on ajoute toutes les réponses bot
-      const botMessages = data.replies.map(reply => ({
-        from: 'bot',
-        text: reply.text || ''
-      }));
-
-      setMessages(prev => [...prev, ...botMessages]);
+      
+      // Validation de la réponse
+      if (data.replies?.length > 0) {
+        const botMessages = data.replies.map(reply => ({
+          from: 'bot',
+          text: reply.text || ''
+        }));
+        setMessages(prev => [...prev, ...botMessages]);
+      }
 
     } catch (error) {
-      const errorMsg = "Erreur serveur, veuillez réessayer.";
-      setMessages(prev => [...prev, { from: 'bot', text: errorMsg }]);
-      addLog({ type: 'error', content: error.message });
+      console.error('Erreur API:', error);
+      setMessages(prev => [...prev, { 
+        from: 'bot', 
+        text: `Erreur : ${error.message || 'Service indisponible'}`
+      }]);
+    } finally {
+      setIsLoading(false);
+      setInputText('');
     }
-
-    setInputText('');
   };
 
   return (
@@ -58,8 +62,9 @@ const Explore = () => {
             key={i}
             style={{
               textAlign: msg.from === 'user' ? 'right' : 'left',
-              color: msg.from === 'user' ? 'blue' : 'green',
-              margin: '10px 0'
+              color: msg.from === 'user' ? '#1e90ff' : '#2e8b57',
+              margin: '10px 0',
+              wordBreak: 'break-word'
             }}
           >
             <strong>{msg.from === 'user' ? 'Vous' : 'Bot'} :</strong> {msg.text}
@@ -72,11 +77,36 @@ const Explore = () => {
         value={inputText}
         onChange={e => setInputText(e.target.value)}
         placeholder="Écrivez votre message ici..."
-        style={{ width: '100%', padding: '0.5rem', fontSize: '1rem' }}
-        onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+        style={{ 
+          width: '100%', 
+          padding: '0.5rem', 
+          fontSize: '1rem',
+          marginBottom: '0.5rem',
+          resize: 'vertical'
+        }}
+        onKeyDown={e => { 
+          if (e.key === 'Enter' && !e.shiftKey && !isLoading) { 
+            e.preventDefault(); 
+            handleSend(); 
+          } 
+        }}
+        disabled={isLoading}
       />
-      <button onClick={handleSend} style={{ marginTop: 10 }}>
-        Envoyer
+
+      <button 
+        onClick={handleSend} 
+        style={{ 
+          marginTop: 10,
+          padding: '0.5rem 1rem',
+          backgroundColor: isLoading ? '#cccccc' : '#2196F3',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: isLoading ? 'not-allowed' : 'pointer'
+        }}
+        disabled={isLoading}
+      >
+        {isLoading ? 'Envoi en cours...' : 'Envoyer'}
       </button>
     </div>
   );
