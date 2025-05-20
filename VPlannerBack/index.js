@@ -10,7 +10,7 @@ const app = express(); // crée une instance de l'application express
 const PORT = process.env.PORT || 3000; // définit le port de l'application soit le port 3000 ou le port définit dans le .env
 
 app.use(cors({
-  origin: 'https://kyotsuvoyage.vercel.app' // permet de relier le front et le back
+  origin: ['https://kyotsuvoyage.vercel.app', 'http://localhost:3000'] // permet de relier le front et le back
 }
 
 )); // permet de relier le front et le back
