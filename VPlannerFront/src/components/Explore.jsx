@@ -1,6 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const Explore = () => {   
+
+function Explore(props) {   
+
+  useEffect(() => {
+    props.addLog({date: new Date(), message: "il a accédé à la page explore"});
+  }, []);
+
+
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState([
     { from: 'bot', text: 'Bonjour ! Comment puis-je vous aider à planifier votre voyage ?' }
@@ -15,7 +22,7 @@ const Explore = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(process.env.REACT_APP_RASA_ENDPOINT, {
+      const response = await fetch(process.env.REACT_APP_RASA_URL +'/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: inputText, senderId: 'user1' })

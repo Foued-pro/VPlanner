@@ -13,11 +13,7 @@ function App() {
   const addLog = (entry) => {
     setLogs(prev => [...prev, entry]);
   };
-  useEffect(() => {
-    fetch('http://localhost:3000/')
-      .then(response => response.text())
-      .then(data => console.log(data))
-  }, [])
+
 
   return (
     <BrowserRouter>
@@ -40,7 +36,7 @@ function App() {
             </main>
           }
         />
-        <Route path="/explore" element={<Explore />} />
+        <Route path="/explore" element={<Explore addLog={addLog} />} />
         <Route path="/dev" element={<DevPanel logs={logs} />} />
       </Routes>
       <Footer />
