@@ -3,6 +3,8 @@ const express = require('express');  // importe le module express mais cest du h
 const cors = require('cors'); // pour relier le front et le back
 const dotenv = require('dotenv'); // pour charger les variables d'environnement
 const axios = require('axios'); // pour les requêtes HTTP plus simple que fetch
+const helmet = require('helmet');
+
 
 dotenv.config(); // charge les variables d'environnement 
 
@@ -11,9 +13,20 @@ const PORT = process.env.PORT || 3000; // définit le port de l'application soit
 
 app.use(cors({
   origin: ['https://kyotsuvoyage.vercel.app', 'http://localhost:3000'] // permet de relier le front et le back
-}
+}));
 
-)); // permet de relier le front et le back
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'http://localhost:3000', 'https://vplanner.onrender.com'],
+      scriptSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'http://localhost:3000', 'https://vplanner.onrender.com'],
+      fontSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'http://localhost:3000', 'https://vplanner.onrender.com'],
+      imgSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'http://localhost:3000', 'https://vplanner.onrender.com']
+,
+    },
+  })
+);
+
 app.use(express.json()); // permet de parser les requêtes JSON
 
 app.get('/', (req, res) => {
