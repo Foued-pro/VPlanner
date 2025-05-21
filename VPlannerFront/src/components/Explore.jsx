@@ -22,7 +22,7 @@ function Explore(props) {
     setIsLoading(true);
 
     try {
-      const response = await fetch(process.env.REACT_APP_RASA_URL +'/chat', {
+      const response = await fetch(process.env.REACT_APP_NODE_URL + '/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: inputText, senderId: 'user1' })
@@ -52,6 +52,8 @@ function Explore(props) {
       setInputText('');
     }
   };
+  console.log('Envoi au backend:', process.env.REACT_APP_NODE_URL + '/chat');
+
 
   return (
     <div style={{ padding: '2rem', maxWidth: 600, margin: 'auto' }}>
