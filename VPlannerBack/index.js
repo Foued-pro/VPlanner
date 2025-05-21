@@ -82,11 +82,12 @@ app.post('/chat', async (req, res) => {
       return res.status(500).json({ error: "Erreur dans la réponse du serveur IA" });
     }
   } catch (error) {
-    console.error('Erreur API Flask:', error.message);
+    console.error('Erreur API Flask:', error); // ← pas juste .message
     return res.status(500).json({ 
-      reply: [{text: "Erreur lors de la communication avec le serveur IA"}]   
+      error: "Erreur lors de la communication avec le serveur IA",
+      details: error.message
     });
-  }
+  }  
 });
 
 app.get('/', (req, res) => {
