@@ -48,6 +48,7 @@ Message utilisateur: ${userMessage}
 }
 
 app.post('/chat', async (req, res) => {
+  console.log("1 - Message reçu du frontend :", req.body.message);
   const message = req.body.message;
   if (!(message)) {
     return res.status(400).json({
@@ -56,21 +57,28 @@ app.post('/chat', async (req, res) => {
   }
 
   if (!isTravelRelated(message)) {
+    console.log("2 - Message non lié au voyage, on stop");
     return res.json({
       error: "Je ne peux répondre qu’à des questions liées au voyage."
     });
   }
 
   const prompt = preparePrompt(message);
+  console.log("3 - Prompt préparé pour Flask :", prompt);
+
 
   try {
     // Appel au serveur Flask avec le prompt
     const flaskResponse = await axios.post(process.env.FLASK_URL + '/api/chat', { prompt });
+    console.log("4 - Réponse reçue de Flask :", flaskResponse.data);
+
     const replyText = flaskResponse.data.reply || "Pas de réponse";
+    console.log("5 - Réponse prête à envoyer au frontend :", replyText);
 
     if (flaskResponse.status === 200 && flaskResponse.data.reply) {
       return res.json({ reply: [{ text: flaskResponse.data.reply }] });
     } else {
+      console.log("6 - Erreur : réponse inattendue de Flask");
       return res.status(500).json({ error: "Erreur dans la réponse du serveur IA" });
     }
   } catch (error) {
