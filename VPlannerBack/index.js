@@ -16,12 +16,14 @@ app.use(cors({
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
-      defaultSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'http://localhost:3000', 'https://vplanner.onrender.com'],
+      defaultSrc: ["'self'"],
       scriptSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'http://localhost:3000', 'https://vplanner.onrender.com'],
       fontSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'http://localhost:3000', 'https://vplanner.onrender.com'],
+      styleSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'http://localhost:3000', 'https://vplanner.onrender.com'],
       imgSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'http://localhost:3000', 'https://vplanner.onrender.com'],
-    },
+    }
   })
+  
 );
 
 app.use(express.json());
