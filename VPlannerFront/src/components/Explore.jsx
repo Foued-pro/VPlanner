@@ -77,14 +77,6 @@ function Explore(props) {
         }}
         disabled={isLoading}
       />
-
-      <button
-        onClick={handleSend}
-        className="send-button"
-        disabled={isLoading}
-      >
-        {isLoading ? 'Envoi en cours...' : 'Envoyer'}
-      </button>
     </div>
   );
 };
