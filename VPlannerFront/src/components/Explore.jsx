@@ -22,7 +22,7 @@ function Explore(props) {
     setIsLoading(true);
 
     try {
-      const response = await fetch(process.env.REACT_APP_NODE_URL + '/chat', {
+      const response = await fetch('/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: inputText, senderId: 'user1' })
