@@ -6,6 +6,7 @@ import Footer from './components/Footer'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Explore from './components/Explore';
 import DevPanel from './components/DevPanel';
+import Plan from './components/Plan';
 
 function App() {
   const [logs, setLogs] = useState([]);
@@ -38,6 +39,7 @@ function App() {
         />
         <Route path="/explore" element={<Explore addLog={addLog} />} />
         <Route path="/dev" element={<DevPanel logs={logs} />} />
+        <Route path="/plan" />
       </Routes>
       <Footer />
     </BrowserRouter>
