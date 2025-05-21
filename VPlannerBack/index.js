@@ -65,16 +65,19 @@ app.post('/chat', async (req, res) => {
 
   try {
     // Appel au serveur Flask avec le prompt
-    const response = await axios.post(FLASK_URL, { prompt });
+    const flaskResponse = await axios.post(process.env.FLASK_URL + '/api/chat', { prompt });
+    const replyText = flaskResponse.data.reply || "Pas de réponse";
 
-    if (response.status === 200 && response.data.reply) {
-      return res.json({ reply: response.data.reply });
+    if (flaskResponse.status === 200 && flaskResponse.data.reply) {
+      return res.json({ reply: [{ text: flaskResponse.data.reply }] });
     } else {
       return res.status(500).json({ error: "Erreur dans la réponse du serveur IA" });
     }
   } catch (error) {
-    console.error('Erreur appel Flask:', error.message);
-    return res.status(500).json({ error: 'Erreur lors de la communication avec le serveur IA' });
+    console.error('Erreur API Flask:', error.message);
+    return res.status(500).json({ 
+      reply: [{text: "Erreur lors de la communication avec le serveur IA"}]   
+    });
   }
 });
 
