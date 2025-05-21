@@ -15,6 +15,7 @@ function Explore(props) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSend = async () => {
+    console.log("0 - Envoi du message au backend :", inputText);
     if (!inputText.trim()) return;
 
     // Ajout immédiat du message utilisateur
@@ -29,9 +30,11 @@ function Explore(props) {
       });
 
       if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+      console.log("6 - Réponse brute reçue du backend");
 
       const data = await response.json();
-      
+      console.log("7 - Données JSON analysées");
+
       // Validation de la réponse
       if (data.replies?.length > 0) {
         const botMessages = data.replies.map(reply => ({
