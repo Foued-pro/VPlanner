@@ -31,10 +31,6 @@ app.use(
 
 app.use(express.json());
 
-function isTravelRelated(text) {
-  const keywords = ["voyage", "itinéraire", "destination", "vol", "hôtel", "budget", "activité", "tourisme"];
-  return keywords.some(k => text.toLowerCase().includes(k));
-}
 
 function preparePrompt(userMessage) {
   return `
@@ -53,13 +49,6 @@ app.post('/chat', async (req, res) => {
   if (!(message)) {
     return res.status(400).json({
       error: "Message manquant"
-    });
-  }
-
-  if (!isTravelRelated(message)) {
-    console.log("2 - Message non lié au voyage, on stop");
-    return res.json({
-      error: "Je ne peux répondre qu’à des questions liées au voyage."
     });
   }
 
