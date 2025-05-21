@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Explore.css';
+import '../App.css';
 
 function Explore(props) {
   useEffect(() => {
