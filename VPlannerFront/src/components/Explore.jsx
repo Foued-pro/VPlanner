@@ -36,8 +36,8 @@ function Explore(props) {
       console.log("7 - Données JSON analysées");
 
       // Validation de la réponse
-      if (data.replies?.length > 0) {
-        const botMessages = data.replies.map(reply => ({
+      if (data.reply?.length > 0) {
+        const botMessages = data.reply.map(reply => ({
           from: 'bot',
           text: reply.text || ''
         }));
@@ -56,7 +56,6 @@ function Explore(props) {
     }
   };
   console.log('Envoi au backend: /chat');
-
 
   return (
     <div style={{ padding: '2rem', maxWidth: 600, margin: 'auto' }}>

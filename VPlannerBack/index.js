@@ -62,6 +62,7 @@ app.post('/chat', async (req, res) => {
     console.log("4 - Réponse reçue de Flask :", flaskResponse.data);
 
     const replyText = flaskResponse.data.reply || "Pas de réponse";
+    console.log("4.5 - flaskResponse.data :", flaskResponse.data);
     console.log("5 - Réponse prête à envoyer au frontend :", replyText);
 
     if (flaskResponse.status === 200 && flaskResponse.data.reply) {
