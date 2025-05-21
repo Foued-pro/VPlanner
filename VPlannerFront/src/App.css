@@ -103,3 +103,54 @@
   border-bottom: 1px solid #4d3e3e;
   font-size: 14px;
 }
+.explore-container {
+  padding: 2rem;
+  max-width: 600px;
+  margin: auto;
+}
+
+.messages-container {
+  border: 1px solid #ccc;
+  padding: 10px;
+  min-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.message {
+  margin: 10px 0;
+  word-break: break-word;
+}
+
+.user-message {
+  text-align: right;
+  color: #1e90ff;
+}
+
+.bot-message {
+  text-align: left;
+  color: #2e8b57;
+}
+
+.chat-input {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  resize: vertical;
+}
+
+.send-button {
+  margin-top: 10px;
+  padding: 0.5rem 1rem;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.send-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}

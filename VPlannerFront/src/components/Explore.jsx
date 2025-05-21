@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import './Explore.css';
 
-function Explore(props) {   
-
+function Explore(props) {
   useEffect(() => {
-    props.addLog({date: new Date(), message: "il a accédé à la page explore"});
+    props.addLog({ date: new Date(), message: "il a accédé à la page explore" });
   }, []);
 
   const [inputText, setInputText] = useState('');
@@ -13,10 +13,8 @@ function Explore(props) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSend = async () => {
-    console.log("0 - Envoi du message au backend :", inputText);
     if (!inputText.trim()) return;
 
-    // Ajout immédiat du message utilisateur
     setMessages(prev => [...prev, { from: 'user', text: inputText }]);
     setIsLoading(true);
 
@@ -28,12 +26,8 @@ function Explore(props) {
       });
 
       if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
-      console.log("6 - Réponse brute reçue du backend");
-
       const data = await response.json();
-      console.log("7 - Données JSON analysées");
 
-      // Validation de la réponse
       if (data.reply?.length > 0) {
         const botMessages = data.reply.map(reply => ({
           from: 'bot',
@@ -44,8 +38,8 @@ function Explore(props) {
 
     } catch (error) {
       console.error('Erreur API:', error);
-      setMessages(prev => [...prev, { 
-        from: 'bot', 
+      setMessages(prev => [...prev, {
+        from: 'bot',
         text: `Erreur : ${error.message || 'Service indisponible'}`
       }]);
     } finally {
@@ -53,28 +47,16 @@ function Explore(props) {
       setInputText('');
     }
   };
-  console.log('Envoi au backend: /chat');
 
   return (
-    <div style={{ padding: '2rem', maxWidth: 600, margin: 'auto' }}>
+    <div className="explore-container">
       <h2>Exprimez vos envies de voyage</h2>
 
-      <div style={{
-        border: '1px solid #ccc',
-        padding: 10,
-        minHeight: 300,
-        overflowY: 'auto',
-        marginBottom: 20
-      }}>
+      <div className="messages-container">
         {messages.map((msg, i) => (
           <div
             key={i}
-            style={{
-              textAlign: msg.from === 'user' ? 'right' : 'left',
-              color: msg.from === 'user' ? '#1e90ff' : '#2e8b57',
-              margin: '10px 0',
-              wordBreak: 'break-word'
-            }}
+            className={`message ${msg.from === 'user' ? 'user-message' : 'bot-message'}`}
           >
             <strong>{msg.from === 'user' ? 'Vous' : 'Bot'} :</strong> {msg.text}
           </div>
@@ -86,33 +68,19 @@ function Explore(props) {
         value={inputText}
         onChange={e => setInputText(e.target.value)}
         placeholder="Écrivez votre message ici..."
-        style={{ 
-          width: '100%', 
-          padding: '0.5rem', 
-          fontSize: '1rem',
-          marginBottom: '0.5rem',
-          resize: 'vertical'
-        }}
-        onKeyDown={e => { 
-          if (e.key === 'Enter' && !e.shiftKey && !isLoading) { 
-            e.preventDefault(); 
-            handleSend(); 
-          } 
+        className="chat-input"
+        onKeyDown={e => {
+          if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
+            e.preventDefault();
+            handleSend();
+          }
         }}
         disabled={isLoading}
       />
 
-      <button 
-        onClick={handleSend} 
-        style={{ 
-          marginTop: 10,
-          padding: '0.5rem 1rem',
-          backgroundColor: isLoading ? '#cccccc' : '#2196F3',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: isLoading ? 'not-allowed' : 'pointer'
-        }}
+      <button
+        onClick={handleSend}
+        className="send-button"
         disabled={isLoading}
       >
         {isLoading ? 'Envoi en cours...' : 'Envoyer'}
