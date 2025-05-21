@@ -52,7 +52,7 @@ function Explore(props) {
       setInputText('');
     }
   };
-  console.log('Envoi au backend:', process.env.REACT_APP_NODE_URL + '/chat');
+  console.log('Envoi au backend: /chat');
 
 
   return (
