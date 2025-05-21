@@ -9,7 +9,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-
+const FLASK_URL = process.env.FLASK_URL || "http://localhost:5000/api/chat";
 app.use(cors());
 
 //app.use(cors({
@@ -49,6 +49,12 @@ Message utilisateur: ${userMessage}
 
 app.post('/chat', async (req, res) => {
   const message = req.body.message;
+  if (!(message)) {
+    return res.status(400).json({
+      error: "Message manquant"
+    });
+  }
+
   if (!isTravelRelated(message)) {
     return res.json({
       error: "Je ne peux répondre qu’à des questions liées au voyage."
@@ -58,22 +64,17 @@ app.post('/chat', async (req, res) => {
   const prompt = preparePrompt(message);
 
   try {
-    // Exemple d'appel à l'API HuggingFace Inference
-    const response = await axios.post(
-      'https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3',  
-      { inputs: prompt },
-      {
-        headers: { Authorization: `Bearer ${process.env.HF_API_KEY}` }
-      }
-    );
+    // Appel au serveur Flask avec le prompt
+    const response = await axios.post(FLASK_URL, { prompt });
 
-    // Ici on suppose que la réponse est dans response.data[0].generated_text ou autre selon l'API
-    const aiResponse = response.data[0]?.generated_text || "Pas de réponse";
-
-    res.json({ reply: aiResponse });
+    if (response.status === 200 && response.data.reply) {
+      return res.json({ reply: response.data.reply });
+    } else {
+      return res.status(500).json({ error: "Erreur dans la réponse du serveur IA" });
+    }
   } catch (error) {
-    console.error('Erreur API IA:', error.message);
-    res.status(500).json({ error: 'Erreur lors de la requête au modèle IA' });
+    console.error('Erreur appel Flask:', error.message);
+    return res.status(500).json({ error: 'Erreur lors de la communication avec le serveur IA' });
   }
 });
 
