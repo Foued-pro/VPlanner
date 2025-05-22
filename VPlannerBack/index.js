@@ -20,10 +20,10 @@ app.use(
   helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'http://localhost:3000', 'https://vplanner.onrender.com'],
-      fontSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'http://localhost:3000', 'https://vplanner.onrender.com'],
-      styleSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'http://localhost:3000', 'https://vplanner.onrender.com'],
-      imgSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'http://localhost:3000', 'https://vplanner.onrender.com'],
+      scriptSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'https://vplanner.onrender.com'],
+      fontSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'https://vplanner.onrender.com'],
+      styleSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'https://vplanner.onrender.com'],
+      imgSrc: ["'self'", 'https://kyotsuvoyage.vercel.app', 'https://vplanner.onrender.com'],
     }
   })
   
@@ -33,46 +33,51 @@ app.use(express.json());
 
 
 function preparePrompt(userMessage) {
-  return `
-Tu es un assistant expert en planification de voyages.
-Tu dois uniquement aider à créer des itinéraires, proposer des activités, des budgets, et des conseils de voyage.
-Ne réponds pas aux questions hors sujet.
-Format ta réponse au format JSON avec ces champs : destination, durée, activités, budget, conseils.
+  return`
+Tu es un assistant expert en planification de voyages. Tu dois aider l'utilisateur à organiser son voyage de manière efficace.
+Analyse le message utilisateur. Si des informations importantes sont manquantes (comme la destination, la durée, ou le budget), pose une seule question claire et concise pour compléter les informations. Sinon, fournis un itinéraire personnalisé.
+Formate ta réponse sous forme JSON avec ces champs :
+{
+  "reply": "Texte à afficher dans le chat",
+  "data": {
+    "destination": "...",
+    "durée": "...",
+    "activités": "...",
+    "budget": "...",
+    "conseils": "..."
+  }
+}
 
-Message utilisateur: ${userMessage}
-  `;
+Voici le message utilisateur : ${userMessage}
+`;
 }
 
 app.post('/chat', async (req, res) => {
-  console.log("1 - Message reçu du frontend :", req.body.message);
   const message = req.body.message;
-  if (!(message)) {
+  
+  if (!message) {
     return res.status(400).json({
       error: "Message manquant"
     });
   }
 
   const prompt = preparePrompt(message);
-  console.log("3 - Prompt préparé pour Flask :", prompt);
-
 
   try {
     // Appel au serveur Flask avec le prompt
-    const flaskResponse = await axios.post(process.env.FLASK_URL + '/api/chat', { prompt });
-    console.log("4 - Réponse reçue de Flask :", flaskResponse.data);
-
-    const replyText = flaskResponse.data.reply || "Pas de réponse";
-    console.log("4.5 - flaskResponse.data :", flaskResponse.data);
-    console.log("5 - Réponse prête à envoyer au frontend :", replyText);
+    const flaskResponse = await axios.post(FLASK_URL, { prompt });
 
     if (flaskResponse.status === 200 && flaskResponse.data.reply) {
-      return res.json({ reply: [{ text: flaskResponse.data.reply }] });
+      return res.json({ 
+        reply: [{ text: flaskResponse.data.reply }],
+        data: flaskResponse.data.data || {}
+      });
     } else {
-      console.log("6 - Erreur : réponse inattendue de Flask");
+      console.log("Erreur : réponse inattendue de Flask");
       return res.status(500).json({ error: "Erreur dans la réponse du serveur IA" });
     }
   } catch (error) {
-    console.error('Erreur API Flask:', error); // ← pas juste .message
+    console.error('Erreur API Flask:', error);
     return res.status(500).json({ 
       error: "Erreur lors de la communication avec le serveur IA",
       details: error.message

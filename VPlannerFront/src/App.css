@@ -126,13 +126,12 @@
 
 .user-message {
   text-align: right;
-  color: #1e90ff;
-  
+  color: #ffffff;
 }
 
 .bot-message {
   text-align: left;
-  color: #2e8b57;
+  color: #14afaf;
 }
 
 .chat-input {

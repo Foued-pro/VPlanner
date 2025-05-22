@@ -12,6 +12,8 @@ function Explore(props) {
   ]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [voyage, setVoyage] = useState(null);
+
   const handleSend = async () => {
     if (!inputText.trim()) return;
 
@@ -34,6 +36,9 @@ function Explore(props) {
           text: reply.text || ''
         }));
         setMessages(prev => [...prev, ...botMessages]);
+        if (data.data && Object.keys(data.data).length > 0) {
+          setVoyage(data.data);
+        }
       }
 
     } catch (error) {
@@ -77,6 +82,18 @@ function Explore(props) {
         }}
         disabled={isLoading}
       />
+      <div className="info-panel">
+        <h4>Résumé du voyage</h4>
+        {voyage ? (
+          <ul>
+            <li><strong>Destination :</strong> {voyage.destination || "?"}</li>
+            <li><strong>Durée :</strong> {voyage.durée || "?"}</li>
+            <li><strong>Activités :</strong> {voyage.activités || "?"}</li>
+            <li><strong>Budget :</strong> {voyage.budget || "?"}</li>
+            <li><strong>Conseils :</strong> {voyage.conseils || "?"}</li>
+          </ul>
+        ) : <p>Pas encore d'informations.</p>}
+      </div>
     </div>
   );
 };
