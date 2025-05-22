@@ -33,20 +33,36 @@ app.use(express.json());
 
 
 function preparePrompt(userMessage) {
-  return`
-Tu es un assistant expert en planification de voyages. Tu dois aider l'utilisateur à organiser son voyage de manière efficace.
-Analyse le message utilisateur. Si des informations importantes sont manquantes (comme la destination, la durée, ou le budget), pose une seule question claire et concise pour compléter les informations. Sinon, fournis un itinéraire personnalisé.
-Formate ta réponse sous forme JSON avec ces champs :
+  return `
+Tu es un assistant expert en planification de voyages.
+
+Ta mission est de construire un itinéraire personnalisé, mais uniquement à partir des informations fournies par l'utilisateur. Tu ne dois jamais inventer de données. Si une information nécessaire manque (comme la durée, le budget, ou les activités préférées), pose des questions à l'utilisateur pour les obtenir.
+
+Tu dois répondre dans un format JSON structuré, avec les champs suivants :
+- destination
+- durée
+- activités
+- budget
+- conseils
+- questions
+
+Si un champ ne peut pas encore être rempli, laisse-le vide et ajoute une ou plusieurs questions spécifiques dans le champ \`questions\` pour demander les informations manquantes à l'utilisateur.
+
+Exemple de réponse :
+\`\`\`json
 {
-  "reply": "Texte à afficher dans le chat",
-  "data": {
-    "destination": "...",
-    "durée": "...",
-    "activités": "...",
-    "budget": "...",
-    "conseils": "..."
-  }
+  "destination": "Japon",
+  "durée": "",
+  "activités": "",
+  "budget": "",
+  "conseils": "",
+  "questions": [
+    "Combien de jours comptes-tu partir ?",
+    "Quel est ton budget total ?",
+    "Quels types d'activités aimes-tu (culture, nature, gastronomie, etc.) ?"
+  ]
 }
+\`\`\`
 
 Voici le message utilisateur : ${userMessage}
 `;
@@ -84,6 +100,7 @@ app.post('/chat', async (req, res) => {
     });
   }  
 });
+
 
 app.get('/', (req, res) => {
   res.send("Serveur backend KyotsuVoyage opérationnel !");
