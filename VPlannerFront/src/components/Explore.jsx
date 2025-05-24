@@ -44,7 +44,23 @@ function Explore(props) {
             const jsonMatch = reply.text.match(/```json\n([\s\S]*?)\n```/);
             if (jsonMatch) {
               const jsonData = JSON.parse(jsonMatch[1]);
-              setVoyage(jsonData);
+              
+              // Mettre à jour l'état en conservant les informations précédentes
+              setVoyage(prev => {
+                const updatedVoyage = { ...prev };
+                
+                // Ne mettre à jour que les champs qui ont des valeurs
+                if (jsonData.destination) updatedVoyage.destination = jsonData.destination;
+                if (jsonData.durée) updatedVoyage.durée = jsonData.durée;
+                if (jsonData.activités) updatedVoyage.activités = jsonData.activités;
+                if (jsonData.budget) updatedVoyage.budget = jsonData.budget;
+                if (jsonData.conseils) updatedVoyage.conseils = jsonData.conseils;
+                
+                // Pour les questions, on les remplace car ce sont les nouvelles questions à poser
+                if (jsonData.questions) updatedVoyage.questions = jsonData.questions;
+                
+                return updatedVoyage;
+              });
               
               // Retourner uniquement les questions comme message
               if (jsonData.questions && jsonData.questions.length > 0) {
