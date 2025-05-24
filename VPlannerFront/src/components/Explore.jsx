@@ -44,38 +44,51 @@ function Explore(props) {
     setIsLoading(true);
 
     try {
-      console.log('Envoi au backend:', {
+      const requestBody = {
         message: inputText,
-        sessionId: sessionId,
-        currentVoyage: voyage
-      });
+        senderId: sessionId,
+        currentVoyage: voyage,
+        context: {
+          lastMessage: inputText,
+          previousMessages: messages.slice(-5).map(msg => ({
+            role: msg.from === 'user' ? 'user' : 'assistant',
+            content: msg.text
+          }))
+        }
+      };
+
+      console.log('Envoi au backend:', JSON.stringify(requestBody, null, 2));
 
       const response = await fetch('/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          message: inputText,
-          sessionId: sessionId,
-          currentVoyage: voyage
-        })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) {
-        console.error('Erreur réponse:', response.status);
-        throw new Error(`Erreur HTTP: ${response.status}`);
+        const errorText = await response.text();
+        console.error('Erreur réponse:', response.status, errorText);
+        throw new Error(`Erreur HTTP: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
-      console.log('Réponse du backend:', data);
+      console.log('Réponse complète du backend:', JSON.stringify(data, null, 2));
 
       if (data.reply?.length > 0) {
         const botMessages = data.reply.map(reply => {
+          console.log('Traitement de la réponse:', JSON.stringify(reply, null, 2));
+          
           try {
+            // Chercher d'abord les données JSON dans la réponse
             const jsonMatch = reply.text.match(/```json\n([\s\S]*?)\n```/);
             if (jsonMatch) {
               const jsonData = JSON.parse(jsonMatch[1]);
-              console.log('Données JSON extraites:', jsonData);
+              console.log('Données JSON extraites:', JSON.stringify(jsonData, null, 2));
               
+              // Mettre à jour le panneau d'information
               setVoyage(prev => {
                 const updatedVoyage = { ...prev };
                 Object.entries(jsonData).forEach(([key, value]) => {
@@ -83,7 +96,8 @@ function Explore(props) {
                 });
                 return updatedVoyage;
               });
-              
+
+              // Retourner uniquement les questions pour le chat
               if (jsonData.questions?.length > 0) {
                 return {
                   from: 'bot',
@@ -91,14 +105,35 @@ function Explore(props) {
                 };
               }
             }
+
+            // Si pas de JSON, chercher des informations structurées dans le texte
+            const destinationMatch = reply.text.match(/destination[:\s]+([^\.]+)/i);
+            const dureeMatch = reply.text.match(/durée[:\s]+([^\.]+)/i);
+            const activitesMatch = reply.text.match(/activités[:\s]+([^\.]+)/i);
+            const budgetMatch = reply.text.match(/budget[:\s]+([^\.]+)/i);
+
+            if (destinationMatch || dureeMatch || activitesMatch || budgetMatch) {
+              setVoyage(prev => ({
+                ...prev,
+                ...(destinationMatch && { destination: destinationMatch[1].trim() }),
+                ...(dureeMatch && { durée: dureeMatch[1].trim() }),
+                ...(activitesMatch && { activités: activitesMatch[1].trim() }),
+                ...(budgetMatch && { budget: budgetMatch[1].trim() })
+              }));
+            }
+
+            // Retourner le texte pour le chat
+            return {
+              from: 'bot',
+              text: reply.text
+            };
           } catch (e) {
-            console.log("Pas de données JSON dans la réponse:", e);
+            console.log("Erreur de traitement de la réponse:", e);
+            return {
+              from: 'bot',
+              text: reply.text
+            };
           }
-          
-          return {
-            from: 'bot',
-            text: reply.text
-          };
         });
         
         setMessages(prev => [...prev, ...botMessages]);
