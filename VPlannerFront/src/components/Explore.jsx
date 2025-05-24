@@ -49,10 +49,7 @@ function Explore(props) {
           const jsonMatch = data.reply[0].text.match(/```json\n([\s\S]*?)\n```/);
           if (jsonMatch) {
             const jsonData = JSON.parse(jsonMatch[1]);
-            setVoyage(prev => ({
-              ...prev,
-              ...jsonData
-            }));
+            setVoyage(jsonData);
           }
         } catch (e) {
           console.log("Pas de données JSON dans la réponse");
