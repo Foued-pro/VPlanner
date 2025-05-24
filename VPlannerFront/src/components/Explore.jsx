@@ -46,7 +46,7 @@ function Explore(props) {
 
         // Essayer de parser la réponse JSON du bot
         try {
-          const jsonMatch = reply.text.match(/```json\n([\s\S]*?)\n```/);
+          const jsonMatch = data.reply[0].text.match(/```json\n([\s\S]*?)\n```/);
           if (jsonMatch) {
             const jsonData = JSON.parse(jsonMatch[1]);
             setVoyage(prev => ({
