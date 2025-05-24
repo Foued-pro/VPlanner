@@ -5,12 +5,7 @@
       "destination": "https://vplanner.onrender.com/chat"
     },
     {
-      "source": "/webhooks/rest/:path*",
-      "destination": "https://rasa-vplanner.onrender.com/webhooks/rest/:path*"
-    },
-    {
       "source": "/(.*)", "destination": "/"
     }
-
   ]
 }

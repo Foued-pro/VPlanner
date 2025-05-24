@@ -9,7 +9,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const FLASK_URL = process.env.FLASK_URL || "http://localhost:5000/api/chat";
+const FLASK_URL = process.env.FLASK_URL || "https://poko-sqpz.onrender.com/api/chat";
 app.use(cors());
 
 //app.use(cors({
