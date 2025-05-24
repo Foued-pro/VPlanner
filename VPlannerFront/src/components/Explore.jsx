@@ -1,7 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../App.css';
 
 function Explore(props) {
+  const messagesEndRef = useRef(null);
+  const [sessionId] = useState(() => {
+    // Générer un ID de session unique
+    return 'user_' + Math.random().toString(36).substr(2, 9);
+  });
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   useEffect(() => {
     props.addLog({ date: new Date(), message: "il a accédé à la page explore" });
   }, []);
@@ -31,7 +45,11 @@ function Explore(props) {
       const response = await fetch('/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: inputText })
+        body: JSON.stringify({ 
+          message: inputText,
+          sessionId: sessionId,
+          currentVoyage: voyage // Envoyer l'état actuel du voyage
+        })
       });
 
       if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
@@ -39,30 +57,24 @@ function Explore(props) {
 
       if (data.reply?.length > 0) {
         const botMessages = data.reply.map(reply => {
-          // Essayer de parser la réponse JSON du bot
           try {
             const jsonMatch = reply.text.match(/```json\n([\s\S]*?)\n```/);
             if (jsonMatch) {
               const jsonData = JSON.parse(jsonMatch[1]);
               
-              // Mettre à jour l'état en conservant les informations précédentes
               setVoyage(prev => {
                 const updatedVoyage = { ...prev };
                 
-                // Ne mettre à jour que les champs qui ont des valeurs
                 if (jsonData.destination) updatedVoyage.destination = jsonData.destination;
                 if (jsonData.durée) updatedVoyage.durée = jsonData.durée;
                 if (jsonData.activités) updatedVoyage.activités = jsonData.activités;
                 if (jsonData.budget) updatedVoyage.budget = jsonData.budget;
                 if (jsonData.conseils) updatedVoyage.conseils = jsonData.conseils;
-                
-                // Pour les questions, on les remplace car ce sont les nouvelles questions à poser
                 if (jsonData.questions) updatedVoyage.questions = jsonData.questions;
                 
                 return updatedVoyage;
               });
               
-              // Retourner uniquement les questions comme message
               if (jsonData.questions && jsonData.questions.length > 0) {
                 return {
                   from: 'bot',
@@ -74,7 +86,6 @@ function Explore(props) {
             console.log("Pas de données JSON dans la réponse");
           }
           
-          // Si ce n'est pas du JSON ou s'il n'y a pas de questions, retourner le message original
           return {
             from: 'bot',
             text: reply.text
@@ -128,6 +139,7 @@ function Explore(props) {
                 </div>
               </div>
             )}
+            <div ref={messagesEndRef} />
           </div>
 
           <div className="input-section">
