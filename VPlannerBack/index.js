@@ -9,7 +9,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const FLASK_URL = process.env.FLASK_URL || "https://poko-sqpz.onrender.com/api/chat";
+const FLASK_URL = process.env.FLASK_URL || "https://poko-sqpz.onrender.com";
 app.use(cors());
 
 //app.use(cors({
@@ -81,7 +81,7 @@ app.post('/chat', async (req, res) => {
 
   try {
     // Appel au serveur Flask avec le prompt
-    const flaskResponse = await axios.post(FLASK_URL, { prompt }, {
+    const flaskResponse = await axios.post(`${FLASK_URL}/api/chat`, { prompt }, {
       headers: {
         'Content-Type': 'application/json'
       }
