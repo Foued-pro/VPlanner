@@ -44,6 +44,12 @@ function Explore(props) {
     setIsLoading(true);
 
     try {
+      console.log('Envoi au backend:', {
+        message: inputText,
+        sessionId: sessionId,
+        currentVoyage: voyage
+      });
+
       const response = await fetch('/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,8 +60,13 @@ function Explore(props) {
         })
       });
 
-      if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+      if (!response.ok) {
+        console.error('Erreur réponse:', response.status);
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
       const data = await response.json();
+      console.log('Réponse du backend:', data);
 
       if (data.reply?.length > 0) {
         const botMessages = data.reply.map(reply => {
@@ -63,6 +74,7 @@ function Explore(props) {
             const jsonMatch = reply.text.match(/```json\n([\s\S]*?)\n```/);
             if (jsonMatch) {
               const jsonData = JSON.parse(jsonMatch[1]);
+              console.log('Données JSON extraites:', jsonData);
               
               setVoyage(prev => {
                 const updatedVoyage = { ...prev };
@@ -80,7 +92,7 @@ function Explore(props) {
               }
             }
           } catch (e) {
-            console.log("Pas de données JSON dans la réponse");
+            console.log("Pas de données JSON dans la réponse:", e);
           }
           
           return {
@@ -90,6 +102,12 @@ function Explore(props) {
         });
         
         setMessages(prev => [...prev, ...botMessages]);
+      } else {
+        console.log('Pas de réponse du bot');
+        setMessages(prev => [...prev, {
+          from: 'bot',
+          text: 'Désolé, je n\'ai pas pu traiter votre demande. Veuillez réessayer.'
+        }]);
       }
     } catch (error) {
       console.error('Erreur API:', error);
