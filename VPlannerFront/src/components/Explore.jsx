@@ -12,7 +12,14 @@ function Explore(props) {
   ]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [voyage, setVoyage] = useState(null);
+  const [voyage, setVoyage] = useState({
+    destination: "",
+    durée: "",
+    activités: "",
+    budget: "",
+    conseils: "",
+    questions: []
+  });
 
   const handleSend = async () => {
     if (!inputText.trim()) return;
@@ -24,7 +31,7 @@ function Explore(props) {
       const response = await fetch('/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: inputText, senderId: 'user1' })
+        body: JSON.stringify({ message: inputText })
       });
 
       if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
@@ -36,8 +43,19 @@ function Explore(props) {
           text: reply.text || ''
         }));
         setMessages(prev => [...prev, ...botMessages]);
-        if (data.data && Object.keys(data.data).length > 0) {
-          setVoyage(data.data);
+
+        // Essayer de parser la réponse JSON du bot
+        try {
+          const jsonMatch = reply.text.match(/```json\n([\s\S]*?)\n```/);
+          if (jsonMatch) {
+            const jsonData = JSON.parse(jsonMatch[1]);
+            setVoyage(prev => ({
+              ...prev,
+              ...jsonData
+            }));
+          }
+        } catch (e) {
+          console.log("Pas de données JSON dans la réponse");
         }
       }
 
@@ -57,42 +75,105 @@ function Explore(props) {
     <div className="explore-container">
       <h2>Exprimez vos envies de voyage</h2>
 
-      <div className="messages-container">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`message ${msg.from === 'user' ? 'user-message' : 'bot-message'}`}
+      <div className="chat-section">
+        <div className="messages-container">
+          {messages.map((msg, i) => (
+            <div
+              key={i}
+              className={`message ${msg.from === 'user' ? 'user-message' : 'bot-message'}`}
+            >
+              <div className="message-header">
+                <strong>{msg.from === 'user' ? 'Vous' : 'Bot'}</strong>
+              </div>
+              <div className="message-content">{msg.text}</div>
+            </div>
+          ))}
+          {isLoading && (
+            <div className="message bot-message loading">
+              <div className="message-header">
+                <strong>Bot</strong>
+              </div>
+              <div className="message-content">
+                <div className="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="input-section">
+          <textarea
+            rows={3}
+            value={inputText}
+            onChange={e => setInputText(e.target.value)}
+            placeholder="Écrivez votre message ici..."
+            className="chat-input"
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+            disabled={isLoading}
+          />
+          <button 
+            className="send-button"
+            onClick={handleSend}
+            disabled={isLoading || !inputText.trim()}
           >
-            <strong>{msg.from === 'user' ? 'Vous' : 'Bot'} :</strong> {msg.text}
-          </div>
-        ))}
+            Envoyer
+          </button>
+        </div>
       </div>
 
-      <textarea
-        rows={3}
-        value={inputText}
-        onChange={e => setInputText(e.target.value)}
-        placeholder="Écrivez votre message ici..."
-        className="chat-input"
-        onKeyDown={e => {
-          if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
-            e.preventDefault();
-            handleSend();
-          }
-        }}
-        disabled={isLoading}
-      />
       <div className="info-panel">
-        <h4>Résumé du voyage</h4>
-        {voyage ? (
-          <ul>
-            <li><strong>Destination :</strong> {voyage.destination || "?"}</li>
-            <li><strong>Durée :</strong> {voyage.durée || "?"}</li>
-            <li><strong>Activités :</strong> {voyage.activités || "?"}</li>
-            <li><strong>Budget :</strong> {voyage.budget || "?"}</li>
-            <li><strong>Conseils :</strong> {voyage.conseils || "?"}</li>
-          </ul>
-        ) : <p>Pas encore d'informations.</p>}
+        <h3>Informations du voyage</h3>
+        <div className="info-content">
+          {voyage.destination && (
+            <div className="info-item">
+              <h4>Destination</h4>
+              <p>{voyage.destination}</p>
+            </div>
+          )}
+          {voyage.durée && (
+            <div className="info-item">
+              <h4>Durée</h4>
+              <p>{voyage.durée}</p>
+            </div>
+          )}
+          {voyage.activités && (
+            <div className="info-item">
+              <h4>Activités</h4>
+              <p>{voyage.activités}</p>
+            </div>
+          )}
+          {voyage.budget && (
+            <div className="info-item">
+              <h4>Budget</h4>
+              <p>{voyage.budget}</p>
+            </div>
+          )}
+          {voyage.conseils && (
+            <div className="info-item">
+              <h4>Conseils</h4>
+              <p>{voyage.conseils}</p>
+            </div>
+          )}
+          
+          {voyage.questions && voyage.questions.length > 0 && (
+            <div className="questions-section">
+              <h4>Questions en attente</h4>
+              <ul>
+                {voyage.questions.map((question, index) => (
+                  <li key={index}>{question}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
