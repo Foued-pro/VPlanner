@@ -73,106 +73,108 @@ function Explore(props) {
 
   return (
     <div className="explore-container">
-      <h2>Exprimez vos envies de voyage</h2>
-
-      <div className="chat-section">
-        <div className="messages-container">
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              className={`message ${msg.from === 'user' ? 'user-message' : 'bot-message'}`}
-            >
-              <div className="message-header">
-                <strong>{msg.from === 'user' ? 'Vous' : 'Bot'}</strong>
+      <h1 className="explore-title">Exprimez vos envies de voyage</h1>
+      
+      <div className="explore-content">
+        <div className="chat-section">
+          <div className="messages-container">
+            {messages.map((msg, i) => (
+              <div
+                key={i}
+                className={`message ${msg.from === 'user' ? 'user-message' : 'bot-message'}`}
+              >
+                <div className="message-header">
+                  <strong>{msg.from === 'user' ? 'Vous' : 'Bot'}</strong>
+                </div>
+                <div className="message-content">{msg.text}</div>
               </div>
-              <div className="message-content">{msg.text}</div>
-            </div>
-          ))}
-          {isLoading && (
-            <div className="message bot-message loading">
-              <div className="message-header">
-                <strong>Bot</strong>
-              </div>
-              <div className="message-content">
-                <div className="typing-indicator">
-                  <span></span>
-                  <span></span>
-                  <span></span>
+            ))}
+            {isLoading && (
+              <div className="message bot-message loading">
+                <div className="message-header">
+                  <strong>Bot</strong>
+                </div>
+                <div className="message-content">
+                  <div className="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+
+          <div className="input-section">
+            <textarea
+              rows={3}
+              value={inputText}
+              onChange={e => setInputText(e.target.value)}
+              placeholder="Écrivez votre message ici..."
+              className="chat-input"
+              onKeyDown={e => {
+                if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+              disabled={isLoading}
+            />
+            <button 
+              className="send-button"
+              onClick={handleSend}
+              disabled={isLoading || !inputText.trim()}
+            >
+              Envoyer
+            </button>
+          </div>
         </div>
 
-        <div className="input-section">
-          <textarea
-            rows={3}
-            value={inputText}
-            onChange={e => setInputText(e.target.value)}
-            placeholder="Écrivez votre message ici..."
-            className="chat-input"
-            onKeyDown={e => {
-              if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
-                e.preventDefault();
-                handleSend();
-              }
-            }}
-            disabled={isLoading}
-          />
-          <button 
-            className="send-button"
-            onClick={handleSend}
-            disabled={isLoading || !inputText.trim()}
-          >
-            Envoyer
-          </button>
-        </div>
-      </div>
-
-      <div className="info-panel">
-        <h3>Informations du voyage</h3>
-        <div className="info-content">
-          {voyage.destination && (
-            <div className="info-item">
-              <h4>Destination</h4>
-              <p>{voyage.destination}</p>
-            </div>
-          )}
-          {voyage.durée && (
-            <div className="info-item">
-              <h4>Durée</h4>
-              <p>{voyage.durée}</p>
-            </div>
-          )}
-          {voyage.activités && (
-            <div className="info-item">
-              <h4>Activités</h4>
-              <p>{voyage.activités}</p>
-            </div>
-          )}
-          {voyage.budget && (
-            <div className="info-item">
-              <h4>Budget</h4>
-              <p>{voyage.budget}</p>
-            </div>
-          )}
-          {voyage.conseils && (
-            <div className="info-item">
-              <h4>Conseils</h4>
-              <p>{voyage.conseils}</p>
-            </div>
-          )}
-          
-          {voyage.questions && voyage.questions.length > 0 && (
-            <div className="questions-section">
-              <h4>Questions en attente</h4>
-              <ul>
-                {voyage.questions.map((question, index) => (
-                  <li key={index}>{question}</li>
-                ))}
-              </ul>
-            </div>
-          )}
+        <div className="info-panel">
+          <h3>Informations du voyage</h3>
+          <div className="info-content">
+            {voyage.destination && (
+              <div className="info-item">
+                <h4>Destination</h4>
+                <p>{voyage.destination}</p>
+              </div>
+            )}
+            {voyage.durée && (
+              <div className="info-item">
+                <h4>Durée</h4>
+                <p>{voyage.durée}</p>
+              </div>
+            )}
+            {voyage.activités && (
+              <div className="info-item">
+                <h4>Activités</h4>
+                <p>{voyage.activités}</p>
+              </div>
+            )}
+            {voyage.budget && (
+              <div className="info-item">
+                <h4>Budget</h4>
+                <p>{voyage.budget}</p>
+              </div>
+            )}
+            {voyage.conseils && (
+              <div className="info-item">
+                <h4>Conseils</h4>
+                <p>{voyage.conseils}</p>
+              </div>
+            )}
+            
+            {voyage.questions && voyage.questions.length > 0 && (
+              <div className="questions-section">
+                <h4>Questions en attente</h4>
+                <ul>
+                  {voyage.questions.map((question, index) => (
+                    <li key={index}>{question}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
