@@ -15,7 +15,7 @@ function Explore(props) {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
+ 
   useEffect(() => {
     props.addLog({ date: new Date(), message: "il a accédé à la page explore" });
   }, []);
