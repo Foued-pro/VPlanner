@@ -2,30 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../App.css';
 
 function Explore(props) {
-  const messagesEndRef = useRef(null);
-  const [sessionId] = useState(() => {
-    // Générer un ID de session unique
-    return 'user_' + Math.random().toString(36).substr(2, 9);
-  });
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
- 
-  useEffect(() => {
-    props.addLog({ date: new Date(), message: "il a accédé à la page explore" });
-  }, []);
-
+  // États initiaux
   const [inputText, setInputText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState([
     { from: 'bot', text: 'Bonjour ! Comment puis-je vous aider à planifier votre voyage ?' }
   ]);
-  const [isLoading, setIsLoading] = useState(false);
-
   const [voyage, setVoyage] = useState({
     destination: "",
     durée: "",
@@ -35,10 +17,30 @@ function Explore(props) {
     questions: []
   });
 
+  // Références
+  const messagesEndRef = useRef(null);
+  const [sessionId] = useState(() => 'user_' + Math.random().toString(36).substr(2, 9));
+
+  // Fonctions utilitaires
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Effets
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    props.addLog({ date: new Date(), message: "il a accédé à la page explore" });
+  }, []);
+
+  // Gestionnaire d'envoi de message
   const handleSend = async () => {
     if (!inputText.trim()) return;
 
-    setMessages(prev => [...prev, { from: 'user', text: inputText }]);
+    const newMessage = { from: 'user', text: inputText };
+    setMessages(prev => [...prev, newMessage]);
     setIsLoading(true);
 
     try {
@@ -48,7 +50,7 @@ function Explore(props) {
         body: JSON.stringify({ 
           message: inputText,
           sessionId: sessionId,
-          currentVoyage: voyage // Envoyer l'état actuel du voyage
+          currentVoyage: voyage
         })
       });
 
@@ -64,18 +66,13 @@ function Explore(props) {
               
               setVoyage(prev => {
                 const updatedVoyage = { ...prev };
-                
-                if (jsonData.destination) updatedVoyage.destination = jsonData.destination;
-                if (jsonData.durée) updatedVoyage.durée = jsonData.durée;
-                if (jsonData.activités) updatedVoyage.activités = jsonData.activités;
-                if (jsonData.budget) updatedVoyage.budget = jsonData.budget;
-                if (jsonData.conseils) updatedVoyage.conseils = jsonData.conseils;
-                if (jsonData.questions) updatedVoyage.questions = jsonData.questions;
-                
+                Object.entries(jsonData).forEach(([key, value]) => {
+                  if (value) updatedVoyage[key] = value;
+                });
                 return updatedVoyage;
               });
               
-              if (jsonData.questions && jsonData.questions.length > 0) {
+              if (jsonData.questions?.length > 0) {
                 return {
                   from: 'bot',
                   text: jsonData.questions.join('\n')
@@ -94,7 +91,6 @@ function Explore(props) {
         
         setMessages(prev => [...prev, ...botMessages]);
       }
-
     } catch (error) {
       console.error('Erreur API:', error);
       setMessages(prev => [...prev, {
@@ -107,40 +103,74 @@ function Explore(props) {
     }
   };
 
+  // Rendu des messages
+  const renderMessages = () => (
+    <div className="messages-container">
+      {messages.map((msg, i) => (
+        <div
+          key={i}
+          className={`message ${msg.from === 'user' ? 'user-message' : 'bot-message'}`}
+        >
+          <div className="message-header">
+            <strong>{msg.from === 'user' ? 'Vous' : 'Bot'}</strong>
+          </div>
+          <div className="message-content">{msg.text}</div>
+        </div>
+      ))}
+      {isLoading && (
+        <div className="message bot-message loading">
+          <div className="message-header">
+            <strong>Bot</strong>
+          </div>
+          <div className="message-content">
+            <div className="typing-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      )}
+      <div ref={messagesEndRef} />
+    </div>
+  );
+
+  // Rendu du panneau d'information
+  const renderInfoPanel = () => (
+    <div className="info-panel">
+      <h3>Informations du voyage</h3>
+      <div className="info-content">
+        {Object.entries(voyage).map(([key, value]) => {
+          if (!value || key === 'questions') return null;
+          return (
+            <div key={key} className="info-item">
+              <h4>{key.charAt(0).toUpperCase() + key.slice(1)}</h4>
+              <p>{value}</p>
+            </div>
+          );
+        })}
+        
+        {voyage.questions?.length > 0 && (
+          <div className="questions-section">
+            <h4>Questions en attente</h4>
+            <ul>
+              {voyage.questions.map((question, index) => (
+                <li key={index}>{question}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="explore-container">
       <h1 className="explore-title">Exprimez vos envies de voyage</h1>
       
       <div className="explore-content">
         <div className="chat-section">
-          <div className="messages-container">
-            {messages.map((msg, i) => (
-              <div
-                key={i}
-                className={`message ${msg.from === 'user' ? 'user-message' : 'bot-message'}`}
-              >
-                <div className="message-header">
-                  <strong>{msg.from === 'user' ? 'Vous' : 'Bot'}</strong>
-                </div>
-                <div className="message-content">{msg.text}</div>
-              </div>
-            ))}
-            {isLoading && (
-              <div className="message bot-message loading">
-                <div className="message-header">
-                  <strong>Bot</strong>
-                </div>
-                <div className="message-content">
-                  <div className="typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
+          {renderMessages()}
 
           <div className="input-section">
             <textarea
@@ -167,55 +197,10 @@ function Explore(props) {
           </div>
         </div>
 
-        <div className="info-panel">
-          <h3>Informations du voyage</h3>
-          <div className="info-content">
-            {voyage.destination && (
-              <div className="info-item">
-                <h4>Destination</h4>
-                <p>{voyage.destination}</p>
-              </div>
-            )}
-            {voyage.durée && (
-              <div className="info-item">
-                <h4>Durée</h4>
-                <p>{voyage.durée}</p>
-              </div>
-            )}
-            {voyage.activités && (
-              <div className="info-item">
-                <h4>Activités</h4>
-                <p>{voyage.activités}</p>
-              </div>
-            )}
-            {voyage.budget && (
-              <div className="info-item">
-                <h4>Budget</h4>
-                <p>{voyage.budget}</p>
-              </div>
-            )}
-            {voyage.conseils && (
-              <div className="info-item">
-                <h4>Conseils</h4>
-                <p>{voyage.conseils}</p>
-              </div>
-            )}
-            
-            {voyage.questions && voyage.questions.length > 0 && (
-              <div className="questions-section">
-                <h4>Questions en attente</h4>
-                <ul>
-                  {voyage.questions.map((question, index) => (
-                    <li key={index}>{question}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
+        {renderInfoPanel()}
       </div>
     </div>
   );
-};
+}
 
 export default Explore;
