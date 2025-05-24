@@ -38,22 +38,34 @@ function Explore(props) {
       const data = await response.json();
 
       if (data.reply?.length > 0) {
-        const botMessages = data.reply.map(reply => ({
-          from: 'bot',
-          text: reply.text || ''
-        }));
-        setMessages(prev => [...prev, ...botMessages]);
-
-        // Essayer de parser la réponse JSON du bot
-        try {
-          const jsonMatch = data.reply[0].text.match(/```json\n([\s\S]*?)\n```/);
-          if (jsonMatch) {
-            const jsonData = JSON.parse(jsonMatch[1]);
-            setVoyage(jsonData);
+        const botMessages = data.reply.map(reply => {
+          // Essayer de parser la réponse JSON du bot
+          try {
+            const jsonMatch = reply.text.match(/```json\n([\s\S]*?)\n```/);
+            if (jsonMatch) {
+              const jsonData = JSON.parse(jsonMatch[1]);
+              setVoyage(jsonData);
+              
+              // Retourner uniquement les questions comme message
+              if (jsonData.questions && jsonData.questions.length > 0) {
+                return {
+                  from: 'bot',
+                  text: jsonData.questions.join('\n')
+                };
+              }
+            }
+          } catch (e) {
+            console.log("Pas de données JSON dans la réponse");
           }
-        } catch (e) {
-          console.log("Pas de données JSON dans la réponse");
-        }
+          
+          // Si ce n'est pas du JSON ou s'il n'y a pas de questions, retourner le message original
+          return {
+            from: 'bot',
+            text: reply.text
+          };
+        });
+        
+        setMessages(prev => [...prev, ...botMessages]);
       }
 
     } catch (error) {
