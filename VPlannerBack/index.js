@@ -81,7 +81,11 @@ app.post('/chat', async (req, res) => {
 
   try {
     // Appel au serveur Flask avec le prompt
-    const flaskResponse = await axios.post(FLASK_URL, { prompt });
+    const flaskResponse = await axios.post(FLASK_URL, { prompt }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
 
     if (flaskResponse.status === 200 && flaskResponse.data.reply) {
       return res.json({ 
