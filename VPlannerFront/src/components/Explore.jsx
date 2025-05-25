@@ -97,10 +97,16 @@ function Explore(props) {
         // Ajouter la réponse du bot au chat
         setMessages(prev => [...prev, {
           from: 'bot',
-          text: Array.isArray(data.reply[0].text)
-          ? data.reply[0].text.map(t => t.text).join('\n')
-          : data.reply[0].text
-
+          text: (() => {
+            let botText = Array.isArray(data.reply[0].text)
+              ? data.reply[0].text.map(t => t.text).join('\n')
+              : data.reply[0].text;
+        
+            // Nettoyage des blocs de code
+            botText = botText.replace(/```json[\s\S]*?```/g, '').replace(/```[\s\S]*?```/g, '').trim();
+        
+            return botText;
+          })()
         }]);
       } else {
         console.log('Pas de réponse du bot');
