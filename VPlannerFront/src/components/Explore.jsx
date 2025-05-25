@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import '../App.css';
 
 function Explore(props) {
@@ -16,83 +16,99 @@ function Explore(props) {
     conseils: "",
     questions: []
   });
+  const [error, setError] = useState(null);
 
   // Références
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
   const [sessionId] = useState(() => 'user_' + Math.random().toString(36).substr(2, 9));
 
   // Fonctions utilitaires
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  }, []);
 
   // Effets
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, scrollToBottom]);
 
   useEffect(() => {
     props.addLog({ date: new Date(), message: "il a accédé à la page explore" });
+    // Focus sur l'input au chargement
+    inputRef.current?.focus();
   }, []);
 
   // Gestionnaire d'envoi de message
   const handleSend = async () => {
-    if (!inputText.trim()) return;
+    if (!inputText.trim() || isLoading) return;
 
+    setError(null);
     const newMessage = { from: 'user', text: inputText };
     setMessages(prev => [...prev, newMessage]);
     setIsLoading(true);
 
     try {
-      const response = await fetch('/chat', {
+      const requestBody = {
+        message: inputText,
+        currentVoyage: voyage,
+        context: {
+          previousMessages: messages.map(msg => ({
+            role: msg.from === 'user' ? 'user' : 'assistant',
+            content: msg.text
+          }))
+        }
+      };
+
+      console.log('Envoi au backend:', JSON.stringify(requestBody, null, 2));
+
+      // Utiliser l'endpoint de notre serveur Node.js intermédiaire
+      const response = await fetch('https://vplanner.onrender.com/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          message: inputText,
-          sessionId: sessionId,
-          currentVoyage: voyage
-        })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
       });
 
-      if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Erreur réponse:', response.status, errorText);
+        throw new Error(`Erreur HTTP: ${response.status} - ${errorText}`);
+      }
+
       const data = await response.json();
+      console.log('Réponse complète du backend:', JSON.stringify(data, null, 2));
 
       if (data.reply?.length > 0) {
-        const botMessages = data.reply.map(reply => {
-          try {
-            const jsonMatch = reply.text.match(/```json\n([\s\S]*?)\n```/);
-            if (jsonMatch) {
-              const jsonData = JSON.parse(jsonMatch[1]);
-              
-              setVoyage(prev => {
-                const updatedVoyage = { ...prev };
-                Object.entries(jsonData).forEach(([key, value]) => {
-                  if (value) updatedVoyage[key] = value;
-                });
-                return updatedVoyage;
-              });
-              
-              if (jsonData.questions?.length > 0) {
-                return {
-                  from: 'bot',
-                  text: jsonData.questions.join('\n')
-                };
-              }
-            }
-          } catch (e) {
-            console.log("Pas de données JSON dans la réponse");
-          }
-          
-          return {
-            from: 'bot',
-            text: reply.text
-          };
-        });
-        
-        setMessages(prev => [...prev, ...botMessages]);
+        // Mettre à jour le panneau d'information avec les données structurées
+        if (data.data) {
+          setVoyage(prev => ({
+            ...prev,
+            ...(data.data.destination && { destination: data.data.destination }),
+            ...(data.data.durée && { durée: data.data.durée }),
+            ...(data.data.activités && { activités: data.data.activités }),
+            ...(data.data.budget && { budget: data.data.budget }),
+            ...(data.data.questions && { questions: data.data.questions })
+          }));
+        }
+
+        // Ajouter la réponse du bot au chat
+        setMessages(prev => [...prev, {
+          from: 'bot',
+          text: data.reply[0].text
+        }]);
+      } else {
+        console.log('Pas de réponse du bot');
+        setMessages(prev => [...prev, {
+          from: 'bot',
+          text: 'Désolé, je n\'ai pas pu traiter votre demande. Veuillez réessayer.'
+        }]);
       }
     } catch (error) {
       console.error('Erreur API:', error);
+      setError(error.message);
       setMessages(prev => [...prev, {
         from: 'bot',
         text: `Erreur : ${error.message || 'Service indisponible'}`
@@ -100,6 +116,7 @@ function Explore(props) {
     } finally {
       setIsLoading(false);
       setInputText('');
+      inputRef.current?.focus();
     }
   };
 
@@ -114,7 +131,11 @@ function Explore(props) {
           <div className="message-header">
             <strong>{msg.from === 'user' ? 'Vous' : 'Bot'}</strong>
           </div>
-          <div className="message-content">{msg.text}</div>
+          <div className="message-content">
+            {msg.text.split('\n').map((line, index) => (
+              <p key={index}>{line}</p>
+            ))}
+          </div>
         </div>
       ))}
       {isLoading && (
@@ -173,7 +194,9 @@ function Explore(props) {
           {renderMessages()}
 
           <div className="input-section">
+            {error && <div className="error-message">{error}</div>}
             <textarea
+              ref={inputRef}
               rows={3}
               value={inputText}
               onChange={e => setInputText(e.target.value)}
@@ -192,7 +215,7 @@ function Explore(props) {
               onClick={handleSend}
               disabled={isLoading || !inputText.trim()}
             >
-              Envoyer
+              {isLoading ? 'Envoi...' : 'Envoyer'}
             </button>
           </div>
         </div>

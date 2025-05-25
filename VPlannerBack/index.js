@@ -81,10 +81,15 @@ app.post('/chat', async (req, res) => {
 
   try {
     // Appel au serveur Flask avec le prompt
-    const flaskResponse = await axios.post(`${FLASK_URL}/api/chat`, { prompt }, {
+    const flaskResponse = await axios.post(`${FLASK_URL}/api/chat`, {
+      message: message,
+      currentVoyage: req.body.currentVoyage || {},
+      context: req.body.context || {}
+    }, {
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      timeout: 10000 // Timeout de 10 secondes
     });
 
     if (flaskResponse.status === 200 && flaskResponse.data.reply) {
@@ -93,15 +98,35 @@ app.post('/chat', async (req, res) => {
         data: flaskResponse.data.data || {}
       });
     } else {
-      console.log("Erreur : réponse inattendue de Flask");
-      return res.status(500).json({ error: "Erreur dans la réponse du serveur IA" });
+      console.log("Erreur : réponse inattendue de Flask", flaskResponse.data);
+      return res.status(500).json({ 
+        error: "Erreur dans la réponse du serveur IA",
+        details: "Format de réponse invalide"
+      });
     }
   } catch (error) {
     console.error('Erreur API Flask:', error);
-    return res.status(500).json({ 
-      error: "Erreur lors de la communication avec le serveur IA",
-      details: error.message
-    });
+    
+    // Gestion plus détaillée des erreurs
+    if (error.response) {
+      // Le serveur a répondu avec un code d'erreur
+      return res.status(error.response.status).json({ 
+        error: "Erreur du serveur IA",
+        details: error.response.data || error.message
+      });
+    } else if (error.request) {
+      // La requête a été faite mais pas de réponse
+      return res.status(503).json({ 
+        error: "Serveur IA inaccessible",
+        details: "Le serveur ne répond pas"
+      });
+    } else {
+      // Erreur lors de la configuration de la requête
+      return res.status(500).json({ 
+        error: "Erreur de configuration",
+        details: error.message
+      });
+    }
   }  
 });
 
