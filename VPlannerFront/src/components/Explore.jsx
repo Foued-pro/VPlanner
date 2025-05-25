@@ -104,8 +104,13 @@ function Explore(props) {
         
             // Nettoyage des blocs de code
             botText = botText.replace(/```json[\s\S]*?```/g, '').replace(/```[\s\S]*?```/g, '').trim();
+            
+            // Si le texte est vide après nettoyage, utiliser la dernière question
+            if (!botText && data.data?.questions?.length > 0) {
+              botText = data.data.questions[data.data.questions.length - 1];
+            }
         
-            return botText;
+            return botText || "Je ne peux pas traiter votre demande pour le moment.";
           })()
         }]);
       } else {
