@@ -62,7 +62,7 @@ function Explore(props) {
 
       console.log('Envoi au backend:', JSON.stringify(requestBody, null, 2));
 
-      // Utiliser l'endpoint de notre backend Flask
+      // Utiliser l'endpoint de notre serveur Node.js intermédiaire
       const response = await fetch('https://vplanner.onrender.com/chat', {
         method: 'POST',
         headers: { 
