@@ -80,8 +80,13 @@ app.post('/chat', async (req, res) => {
   const prompt = preparePrompt(message);
 
   try {
-    // Appel au serveur Flask avec le prompt
-    const flaskResponse = await axios.post(`${FLASK_URL}/api/chat`, {
+    console.log('Tentative de connexion à:', `${FLASK_URL}/chat`);
+    console.log('Données envoyées:', {
+      message: message,
+      currentVoyage: req.body.currentVoyage || {},
+      context: req.body.context || {}
+    });
+    const flaskResponse = await axios.post(`${FLASK_URL}/chat`, {
       message: message,
       currentVoyage: req.body.currentVoyage || {},
       context: req.body.context || {}
